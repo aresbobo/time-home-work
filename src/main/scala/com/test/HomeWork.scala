@@ -9,27 +9,19 @@ object HomeWork {
       .builder().master("local[*]")
       .appName("Homework")
       .config("spark.some.config.option", "some-value")
-
       .getOrCreate()
-
-
     runHomeWork(spark)
-
     spark.stop()
   }
-  // $example off:create_ds$
 
   private def runHomeWork(spark: SparkSession): Unit = {
     val e_df = spark.read.json("/Users/haibosun/projects/spark/time-home-work/src/main/resources/people.json")
     e_df.createOrReplaceTempView("people")
     spark.sql("SET spark.sql.planChangeLog.level=WARN")
-    val query: String = "select a.name from (select name,age from people where 1 = 1 and age > 20 ) a where a.age<100"
-    spark.sql(query).explain(true)
+    val query_2_1: String = "select a.name from (select name,age from people where true or age > 20 ) a where a.age<100"
+    spark.sql(query_2_1).explain(true)
 
-    val d_df = spark.read.json("/Users/haibosun/projects/spark/time-home-work/src/main/resources/department.json")
-    e_df.createOrReplaceTempView("department")
-    val query1: String = "select distinct a.name from (select * from people where age > 20  and 1 = 1) a where a.depid = 2 except select name from department where depid > 2"
-    spark.sql(query1).explain(true)
+    val query_2_2: String = "select distinct a.name from (select name,age,1.0 x  from people where true or age > 1+19 order by x) a where a.age<100 except(select name from  people where name ='Justin')"
+    spark.sql(query_2_2).explain(true)
   }
-
 }
